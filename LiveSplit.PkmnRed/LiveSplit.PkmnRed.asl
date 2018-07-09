@@ -1,9 +1,35 @@
 state("gambatte") {}
 state("gambatte_qt") {}
 
+//[3:01 AM] Altafen: don't know offhand how to check category name but it's probably a field on the timer object (if that exists.. never used it)(edited)
+//[3:11 AM] Altafen: looks like you get a LiveSplitState timer var -> timer.run.CategoryName gets you the category if you wanted to switch modes automatically
+//[3:12 AM] Altafen: found in LiveSplit.Core/Model/... and LiveSplit.ScriptableAutoSplit/ASL/ASLMethod.cs
+
+
+
+
 startup
 {
     //-------------------------------------------------------------//
+   
+    vars.idManip = false;
+    vars.bugCounter =  "1"; 
+    vars.bugWait = "go";
+
+    vars.gotStarter = "false";
+    vars.starterDropoff = "false";
+    vars.parcel = false;
+    vars.foughtRival = false;
+    vars.foughtPika = false;
+    vars.foughtBugCatcher1 = false;
+    vars.foughtBugCatcher2 = false;
+    vars.foughtBugCatcher3 = false;
+
+    
+    
+    settings.Add("glitchless", false, " Glitchless Splits");
+    settings.CurrentDefaultParent = "glitchless";
+
     settings.Add("nidoran", true, "Catch Nidoran");
     settings.Add("enterMtMoon", true, "Enter Mt. Moon");
     settings.Add("exitMtMoon", true, "Exit Mt. Moon");
@@ -26,8 +52,41 @@ startup
     settings.Add("elite4_4", true, "Lance");
     settings.Add("elite4_5", true, "Champion");
     settings.Add("hofFade", true, "HoF Fade Out (Final Split)");
+
+    
+    settings.CurrentDefaultParent = null;
+    
+    
+    settings.Add("nsc", false, "Any% NSC");
+    settings.CurrentDefaultParent = "nsc";
+   
+    
+    settings.Add("starter", true, "Got a Starter");      
+    settings.Add("rivalFight", true, "Fought Rival");      
+    settings.Add("getParcel", true, "Got Oak's Parcel");
+    settings.Add("giveParcel", true, "Gave Parcel to Oak");
+    settings.Add("getPokeball", true, "Bought a Pokeball");
+    settings.Add("spearow", true, "Caught Spearow");     
+    settings.Add("depositStarter", true, "Deposited Starter");      
+    settings.Add("pikaBattle", true, "Pikachu Manip");  
+    settings.Add("Bug Catchers");
+    settings.CurrentDefaultParent = "Bug Catchers";    
+    settings.Add("bugCatcher1", true, "Fought Bug Catcher 1");
+    settings.Add("bugCatcher2", true, "Fought Bug Catcher 2");
+    settings.Add("bugCatcher3", true, "Fought Bug Catcher 3");
+    settings.CurrentDefaultParent = "nsc";
+
+    settings.Add("hofFadeNSC", true, "HoF Fade Out (Final Split) for NSC");
+
+
+
+    settings.CurrentDefaultParent = null;
+
+
+    
     //-------------------------------------------------------------//
 
+    
     vars.stopwatch = new Stopwatch();
 
     vars.timer_OnStart = (EventHandler)((s, e) =>
@@ -85,9 +144,30 @@ startup
             new MemoryWatcher<byte>(wramOffset + 0x1163) { Name = "partyCount" },
             new MemoryWatcher<byte>(wramOffset + 0x135E) { Name = "mapIndex" },
             new MemoryWatcher<ushort>(wramOffset + 0x1361) { Name = "playerPos" },
-            new MemoryWatcher<ushort>(wramOffset + 0x1FD7) { Name = "hofFadeTimer" },
-            new MemoryWatcher<ushort>(wramOffset + 0x1FFD) { Name = "state" },
+            new MemoryWatcher<ushort>(wramOffset + 0x1FD7) { Name = "hofFadeTimerGlitchless" },
+            new MemoryWatcher<ushort>(wramOffset + 0x1FFD) { Name = "state" },       
+            
+            new MemoryWatcher<byte>(wramOffset + 0x1164) { Name = "pkmn0" },
+            new MemoryWatcher<byte>(wramOffset + 0x1165) { Name = "pkmn1" },
+            new MemoryWatcher<byte>(wramOffset + 0x1166) { Name = "pkmn2" },
+            new MemoryWatcher<byte>(wramOffset + 0x1167) { Name = "pkmn3" },
+            new MemoryWatcher<byte>(wramOffset + 0x1168) { Name = "pkmn4" },
+            new MemoryWatcher<byte>(wramOffset + 0x1169) { Name = "pkmn5" },
+            new MemoryWatcher<byte>(wramOffset + 0x1359) { Name = "idPart1" },
+                             //0xD359 - 0xC000 = 0x1359
+            new MemoryWatcher<byte>(wramOffset + 0x135A) { Name = "idPart2" },
+            new MemoryWatcher<byte>(wramOffset + 0x131E) { Name = "item1" },
+            new MemoryWatcher<byte>(wramOffset + 0x131D) { Name = "numberItems" },
+            
+            new MemoryWatcher<uint>(wramOffset + 0x134A) { Name = "rivalName" },
+            new MemoryWatcher<byte>(wramOffset + 0x0026) { Name = "musicTrack" }, //c026
+            new MemoryWatcher<byte>(wramOffset + 0x00EF) { Name = "musicBank" }, //C0EF 
 
+            
+            new MemoryWatcher<ushort>(wramOffset + 0x1FBF) { Name = "hofFadeTimerNSC" },
+
+
+            
             //HRAM  
             new MemoryWatcher<byte>(hramOffset + 0x33) { Name = "input" },         
         };
@@ -97,6 +177,27 @@ startup
     {
         return new List<Tuple<string, List<Tuple<string, uint>>>>
         {
+           
+            Tuple.Create("starter", new List<Tuple<string, uint>> { Tuple.Create("pkmn0", 0xB0u) }),  // charmander       
+            Tuple.Create("starter", new List<Tuple<string, uint>> { Tuple.Create("pkmn0", 0xB1u) }), // Squirtle        
+            Tuple.Create("starter", new List<Tuple<string, uint>> { Tuple.Create("pkmn0", 0x99u) }), // Bulbasuar              
+            Tuple.Create("getParcel", new List<Tuple<string, uint>> { Tuple.Create("item1", 70u) }),                             
+            Tuple.Create("getPokeball", new List<Tuple<string, uint>> { Tuple.Create("item1", 4u) }),         
+            Tuple.Create("spearow", new List<Tuple<string, uint>> { Tuple.Create("pkmn1", 0x05u) }),
+       
+
+            //pika
+            Tuple.Create("pikaBattle", new List<Tuple<string, uint>> { Tuple.Create("opponentPkmn", 84u), Tuple.Create("state", 0x03AEu) }),
+  
+
+ // need to fix pikaa split
+
+
+
+            Tuple.Create("hofFadeNSC", new List<Tuple<string, uint>> { Tuple.Create("mapIndex", 0x76u), Tuple.Create("hofPlayerShown", 1u), Tuple.Create("hofFadeTimerNSC", 0x0108u) }),
+
+
+            
             Tuple.Create("nidoran", new List<Tuple<string, uint>> { Tuple.Create("partyCount", 2u), Tuple.Create("state", 0x03AEu) }),
             Tuple.Create("enterMtMoon", new List<Tuple<string, uint>> { Tuple.Create("mapIndex", 0x3Bu), Tuple.Create("playerPos", 0x0E23u) }),
             Tuple.Create("exitMtMoon", new List<Tuple<string, uint>> { Tuple.Create("mapIndex", 0x0Fu), Tuple.Create("playerPos", 0x1805u) }),
@@ -113,18 +214,26 @@ startup
             Tuple.Create("gym6", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x91818092), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }),
             Tuple.Create("gym7", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x88808B81), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }),
             Tuple.Create("gym8", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x958E8886), Tuple.Create("mapIndex", 0x2Du), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }),
-            Tuple.Create("elite4_1", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x84918E8B), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }), //Tuple.Create("mapIndex", 0xF5u)
+            Tuple.Create("elite4_1", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x84918E8B), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }), //Tuple.Create("mapIndex", 0xF5u)                                                                   
             Tuple.Create("elite4_2", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x8D949181), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }), //Tuple.Create("mapIndex", 0xF6u)
             Tuple.Create("elite4_3", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x93808680), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }), //Tuple.Create("mapIndex", 0xF7u)
             Tuple.Create("elite4_4", new List<Tuple<string, uint>> { Tuple.Create("opponentName", 0x828D808B), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }), //Tuple.Create("mapIndex", 0x71u)
             Tuple.Create("elite4_5", new List<Tuple<string, uint>> { Tuple.Create("opponentPkmnName", 0x948D8495), Tuple.Create("mapIndex", 0x78u), Tuple.Create("opponentPkmn", 0u), Tuple.Create("state", 0x03AEu) }),
-            Tuple.Create("hofFade", new List<Tuple<string, uint>> { Tuple.Create("mapIndex", 0x76u), Tuple.Create("hofPlayerShown", 1u), Tuple.Create("hofFadeTimer", 0x0108u) }),
+            Tuple.Create("hofFade", new List<Tuple<string, uint>> { Tuple.Create("mapIndex", 0x76u), Tuple.Create("hofPlayerShown", 1u), Tuple.Create("hofFadeTimerGlitchless", 0x0108u) }),
+
+           
         };
     });
 }
 
 init
 {
+    vars.gotStarter = "false";
+    vars.starterDropoff = "false";
+    vars.idManip = false;
+    vars.parcel = false;
+    
+     
     vars.ptrOffset = IntPtr.Zero;
     vars.wramOffset = IntPtr.Zero;
     vars.hramOffset = IntPtr.Zero;
@@ -170,16 +279,191 @@ update
 
 start
 {
+    vars.gotStarter = "false";
+    vars.foughtRival = false;
+    vars.bugCounter =  "1"; 
+    vars.bugWait = "go";
+    
+
+    
+    
     return (vars.watchers["input"].Current & 0x09) != 0 && vars.watchers["fileSelectTiles"].Current == 0x96848DED && vars.watchers["state"].Current == 0x5B91;
 }
 
 reset
 {
     return (vars.watchers["input"].Current & 0x01) != 0 && vars.watchers["resetTiles"].Current == 0x928498ED;
+    
 }
 
 split
 {
+
+
+///////////////// do most of these if seeting is enabled  AND make values reset on timer reset
+
+
+
+// Checks if you got trainer ID manip for NSC 61896  F1C8
+if (vars.idManip == false) {
+vars.trainerID = (vars.watchers["idPart1"].Current + " " + vars.watchers["idPart2"].Current );
+//print("vars.trainerID = " + vars.trainerID );
+ if (vars.trainerID == "241 200") {
+ print("success");
+ vars.idManip = true ;}
+    else {  
+   // print("Trainer ID Manip Wrong");
+    }
+}
+
+
+
+
+vars.rivalName = vars.watchers["rivalName"].Current.ToString();
+vars.opponentName = vars.watchers["opponentName"].Current.ToString();
+
+
+//if you win or lose rival fight then split
+if (vars.foughtRival == false) {
+if (vars.rivalName.ToString() != "0" && vars.opponentName.ToString() != "0"){
+if (vars.opponentName.ToString() == vars.rivalName.ToString() && vars.watchers["opponentPkmn"].Current == 0u &&  vars.watchers["state"].Current == 0x03AEu ){ 
+vars.foughtRival = true;
+print("[Autosplitter] CustomSplit: Fought Rival");
+return true; //split
+}}}
+
+
+
+//if (vars.watchers["item1"].Old == 70u && vars.watchers["item1"].Current == 255u)
+// to shorten the belolow do somethign liek this
+
+if (settings["giveParcel"] == true) {
+//remembers if you got Oak's Parcel 
+ if (vars.watchers["item1"].Current == 70u) { 
+ vars.parcel = true;}
+
+ 
+//Checks if you already have Oak's Parcel and splits when you give it to Oak 
+if (vars.parcel == true && vars.watchers["item1"].Current == 255u) {  
+vars.parcel = false;
+print("[Autosplitter] CustomSplit: Gave Oak's Parcel");
+return true; //split
+}}
+
+
+
+
+
+
+if (settings["depositStarter"] == true) {
+
+ 
+//Remembers Starter Pokemon     
+if (vars.gotStarter.ToString() == "false") {
+if (vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0) {
+vars.starterPkmn = vars.watchers["pkmn0"].Current;
+ vars.gotStarter = "true";
+ print("gotStarter = " + vars.gotStarter.ToString());
+ print("starter is " + vars.starterPkmn.ToString());
+}}
+
+
+//splits when starter pokemon is dropped off  
+if (vars.starterDropoff.ToString() == "false"){
+if (vars.gotStarter.ToString() == "true") {
+if (vars.starterPkmn.ToString() != vars.watchers["pkmn0"].Current.ToString()){
+vars.starterDropoff = "true";
+print("[Autosplitter] CustomSplit: Deposited Started");
+return true; //split
+}}
+}}
+
+
+
+
+if (settings["Bug Catchers"] == true) {
+
+if (vars.bugWait.ToString() == "go" && vars.bugCounter.ToString() ==  "1" ){
+if (vars.watchers["opponentName"].Current.ToString("X") == "7F869481" && vars.watchers["musicTrack"].Current.ToString("X") == "F6" ) {
+print("Bug Catcher " + vars.bugCounter.ToString());
+vars.bugWait = "wait";
+if (settings["bugCatcher1"] == true) {
+print("[Autosplitter] CustomSplit: Beat Bug Catcher 1");
+return true; //split
+}
+}}
+
+
+
+if (vars.bugCounter.ToString() == "1" && vars.bugWait.ToString() == "wait" && vars.watchers["opponentName"].Current.ToString("X") == "7F869481" && vars.watchers["musicTrack"].Current.ToString("X") == "ED" ) {  
+    vars.bugWait = "go";
+    vars.bugCounter =  "2" ;
+  }
+  
+  
+if (vars.bugWait.ToString() == "go" && vars.bugCounter.ToString() ==  "2" ){
+if (vars.watchers["opponentName"].Current.ToString("X") == "7F869481" && vars.watchers["musicTrack"].Current.ToString("X") == "F6" ) {
+print("Bug Catcher " + vars.bugCounter.ToString());
+vars.bugWait = "wait";
+if (settings["bugCatcher2"] == true) {
+print("[Autosplitter] CustomSplit: Beat Bug Catcher 2");
+return true; //split
+}
+}}  
+  
+if (vars.bugCounter.ToString() == "2" && vars.bugWait.ToString() == "wait" && vars.watchers["opponentName"].Current.ToString("X") == "7F869481" && vars.watchers["musicTrack"].Current.ToString("X") == "ED" ) {  
+    vars.bugWait = "go";
+    vars.bugCounter =  "3" ;  
+  }
+  
+if (vars.bugWait.ToString() == "go" && vars.bugCounter.ToString() ==  "3" ){
+if (vars.watchers["opponentName"].Current.ToString("X") == "7F869481" && vars.watchers["musicTrack"].Current.ToString("X") == "F6" ) {
+print("Bug Catcher " + vars.bugCounter.ToString());
+vars.bugWait = "wait";
+if (settings["bugCatcher3"] == true) {
+print("[Autosplitter] CustomSplit: Beat Bug Catcher 3");
+return true; //split
+}
+}}  
+}
+
+  
+  
+  
+  
+
+
+//print("bugvcounter" + vars.bugCounter.ToString());
+//print("bugwait" + vars.bugWait.ToString());
+
+
+//variable.ToString("X") to get hex
+
+//print("opponentName " + vars.watchers["opponentName"].Current.ToString("X"));
+
+//print("opponentPkmn " + vars.watchers["opponentPkmn"].Current.ToString("X"));
+//print("opponentPkmn " + vars.watchers["opponentPkmn"].Current.ToString());
+//print("state " + vars.watchers["state"].Current.ToString("X"));
+
+
+//used to find current song
+//print("musicBank   " + vars.watchers["musicBank"].Current.ToString("X"));
+//print("musicTrack  " + vars.watchers["musicTrack"].Current.ToString("X"));
+
+//print("mapIndex  " + vars.watchers["mapIndex"].Current.ToString("X"));
+//print("hofPlayerShown  " + vars.watchers["hofPlayerShown"].Current.ToString("X"));
+
+//print("mapIndex  " + vars.watchers["mapIndex"].Current.ToString("X"));
+
+
+
+
+
+
+
+
+
+
     foreach (var _split in vars.splits)
     {
         if (settings[_split.Item1])
