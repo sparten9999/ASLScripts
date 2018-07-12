@@ -11,13 +11,14 @@ state("gambatte_qt") {}
 startup
 {
     //-------------------------------------------------------------//
+
    
     vars.idManip = false;
     vars.bugCounter =  "1"; 
     vars.bugWait = "go";
 
-    vars.gotStarter = "false";
-    vars.starterDropoff = "false";
+    vars.gotStarter = false;
+    vars.starterDropoff = false;
     vars.parcel = false;
     vars.foughtRival = false;
     vars.foughtPika = false;
@@ -190,8 +191,6 @@ startup
             Tuple.Create("pikaBattle", new List<Tuple<string, uint>> { Tuple.Create("opponentPkmn", 84u), Tuple.Create("state", 0x03AEu) }),
   
 
- // need to fix pikaa split
-
 
 
             Tuple.Create("hofFadeNSC", new List<Tuple<string, uint>> { Tuple.Create("mapIndex", 0x76u), Tuple.Create("hofPlayerShown", 1u), Tuple.Create("hofFadeTimerNSC", 0x0108u) }),
@@ -228,10 +227,15 @@ startup
 
 init
 {
-    vars.gotStarter = "false";
-    vars.starterDropoff = "false";
+    vars.gotStarter = false;
+    vars.starterDropoff = false;
     vars.idManip = false;
     vars.parcel = false;
+    vars.foughtRival = false;
+    vars.gotStarter = false;
+       vars.starterDropoff = false;
+
+    
     
      
     vars.ptrOffset = IntPtr.Zero;
@@ -248,6 +252,7 @@ init
 
 update
 {
+
     if (vars.stopwatch.ElapsedMilliseconds > 1500)
     {
         vars.FindOffsets(game);
@@ -279,12 +284,15 @@ update
 
 start
 {
-    vars.gotStarter = "false";
+    vars.gotStarter = false;
     vars.foughtRival = false;
     vars.bugCounter =  "1"; 
     vars.bugWait = "go";
     
-
+    vars.starterDropoff = false;
+    vars.idManip = false;
+    vars.parcel = false;
+    vars.starterDropoff = false;
     
     
     return (vars.watchers["input"].Current & 0x09) != 0 && vars.watchers["fileSelectTiles"].Current == 0x96848DED && vars.watchers["state"].Current == 0x5B91;
@@ -352,6 +360,12 @@ return true; //split
 
 
 
+ //print("new liness");
+ //print("gotStarter = " + vars.gotStarter.ToString());
+ //print("pkmn0 " + vars.watchers["pkmn0"].Current.ToString());
+ //print("starterdroppoff is " + vars.starterDropoff );
+ //
+
 
 
 
@@ -359,23 +373,35 @@ if (settings["depositStarter"] == true) {
 
  
 //Remembers Starter Pokemon     
-if (vars.gotStarter.ToString() == "false") {
+if (vars.gotStarter == false) {
 if (vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0) {
 vars.starterPkmn = vars.watchers["pkmn0"].Current;
- vars.gotStarter = "true";
- print("gotStarter = " + vars.gotStarter.ToString());
- print("starter is " + vars.starterPkmn.ToString());
+ vars.gotStarter = true;
+ 
+// print("gotStarter = " + vars.gotStarter.ToString());
+// print("starter is " + vars.starterPkmn.ToString());
+ 
+ 
+ //print("vars.starterDropoff  is " + vars.starterDropoff.ToString());
+ 
+ 
 }}
 
 
 //splits when starter pokemon is dropped off  
-if (vars.starterDropoff.ToString() == "false"){
-if (vars.gotStarter.ToString() == "true") {
+if (vars.starterDropoff == false && vars.gotStarter == true ){
+
+// print("pkmn0 " + vars.watchers["pkmn0"].Current.ToString());
+// print("starter is " + vars.starterPkmn.ToString());
+
+
+
+
 if (vars.starterPkmn.ToString() != vars.watchers["pkmn0"].Current.ToString()){
-vars.starterDropoff = "true";
+vars.starterDropoff = true;
 print("[Autosplitter] CustomSplit: Deposited Started");
 return true; //split
-}}
+}
 }}
 
 
@@ -454,9 +480,6 @@ return true; //split
 //print("hofPlayerShown  " + vars.watchers["hofPlayerShown"].Current.ToString("X"));
 
 //print("mapIndex  " + vars.watchers["mapIndex"].Current.ToString("X"));
-
-
-
 
 
 
