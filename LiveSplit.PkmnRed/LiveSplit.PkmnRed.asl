@@ -24,7 +24,6 @@ startup
     vars.bugWait = "go";
     vars.gotStarter = false;
     vars.starterDropoff = false;
-    vars.parcel = false;
     vars.foughtRival = false;
     vars.foughtPika = false;
     vars.foughtBugCatcher1 = false;
@@ -33,7 +32,7 @@ startup
 
     
     
-    settings.Add("glitchless", false, " Glitchless Splits");
+    settings.Add("glitchless", false, "Glitchless Splits");
     settings.CurrentDefaultParent = "glitchless";
 
     settings.Add("nidoran", true, "Catch Nidoran");
@@ -44,6 +43,10 @@ startup
     settings.Add("flute", true, "Obtain Poké Flute");
     settings.Add("silphGiovanni", true, "Silph Co. (Giovanni)");
     settings.Add("exitVictoryRoad", true, "Exit Victory Road");
+    
+    
+    settings.Add("gymLeaders", true, "Gym Leaders");
+    settings.CurrentDefaultParent = "gymLeaders";
     settings.Add("gym1", true, "Pewter Gym (Brock)");
     settings.Add("gym2", true, "Cerulean Gym (Misty)");
     settings.Add("gym3", true, "Vermilion Gym (Lt. Surge)");
@@ -52,6 +55,11 @@ startup
     settings.Add("gym6", true, "Saffron Gym (Sabrina)");
     settings.Add("gym7", true, "Cinnabar Gym (Blaine)");
     settings.Add("gym8", true, "Viridian Gym (Giovanni)");
+    settings.CurrentDefaultParent = "glitchless";
+
+    
+    settings.Add("elite4", true, "Elite 4");
+    settings.CurrentDefaultParent = "elite4";
     settings.Add("elite4_1", true, "Lorelei");
     settings.Add("elite4_2", true, "Bruno");
     settings.Add("elite4_3", true, "Agatha");
@@ -64,6 +72,7 @@ startup
     
     
     settings.Add("nsc", false, "Any% NSC");
+    settings.SetToolTip("nsc", "This route works for the route as of 7/15/2018 https://docs.google.com/document/d/14Vep4XZ-46nNPb5r2bK3QNut6G8DHzwe8tkZyTZnJrU/edit");
     settings.CurrentDefaultParent = "nsc";
    
     
@@ -81,9 +90,23 @@ startup
     settings.Add("bugCatcher2", true, "Fought Bug Catcher 2");
     settings.Add("bugCatcher3", true, "Fought Bug Catcher 3");
     settings.CurrentDefaultParent = "nsc";
-
     settings.Add("hofFadeNSC", true, "HoF Fade Out (Final Split) for NSC");
 
+    
+    settings.SetToolTip("starter", "Splits when you get a starter and it asks for a nickname");
+    settings.SetToolTip("rivalFight", "");
+    settings.SetToolTip("getParcel", "");
+    settings.SetToolTip("giveParcel", "");
+    settings.SetToolTip("getPokeball", "");
+    settings.SetToolTip("spearow", "Splits when you catch spearow and it asks for a nickname");
+    settings.SetToolTip("depositStarter", "");
+    settings.SetToolTip("Bug Catchers", "Splits when the winning music starts playing");
+    settings.SetToolTip("pikaBattle", "");
+
+    settings.SetToolTip("hofFadeNSC", "Splits on full fade to white");
+    
+    
+    
 
 
     settings.CurrentDefaultParent = null;
@@ -237,7 +260,6 @@ init
     vars.bugWait = "go";
     vars.gotStarter = false;
     vars.starterDropoff = false;
-    vars.parcel = false;
     vars.foughtRival = false;
     vars.foughtPika = false;
     vars.foughtBugCatcher1 = false;
@@ -292,7 +314,6 @@ start
     vars.bugWait = "go";
     vars.gotStarter = false;
     vars.starterDropoff = false;
-    vars.parcel = false;
     vars.foughtRival = false;
     vars.foughtPika = false;
     vars.foughtBugCatcher1 = false;
@@ -341,23 +362,11 @@ return true; //split
 }}
 
 
-
-//if (vars.watchers["item1"].Old == 70u && vars.watchers["item1"].Current == 255u)
-// to shorten the belolow do somethign liek this
-
-if (settings["giveParcel"] == true) {
-//remembers if you got Oak's Parcel 
- if (vars.watchers["item1"].Current == 70u) { 
- vars.parcel = true;}
-
- 
 //Checks if you already have Oak's Parcel and splits when you give it to Oak 
-if (vars.parcel == true && vars.watchers["item1"].Current == 255u) {  
-vars.parcel = false;
+if (vars.watchers["item1"].Old == 70u && vars.watchers["item1"].Current == 255u){
 print("[Autosplitter] CustomSplit: Gave Oak's Parcel");
 return true; //split
-}}
-
+}
 
 
  //print("new liness");
