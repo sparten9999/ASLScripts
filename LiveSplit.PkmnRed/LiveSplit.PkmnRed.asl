@@ -1,3 +1,9 @@
+//Thanks to 
+//Spiraster - for making the base of this code and helping me figure out how to edit it
+//NieDzejkob - for finding new ram address for HoF fade
+//Mango Kangaroo - for providing savestates, route info, and testing the script
+//legendeater - for providing another savestate for testing
+
 state("gambatte") {}
 state("gambatte_qt") {}
 
@@ -16,7 +22,6 @@ startup
     vars.idManip = false;
     vars.bugCounter =  "1"; 
     vars.bugWait = "go";
-
     vars.gotStarter = false;
     vars.starterDropoff = false;
     vars.parcel = false;
@@ -227,43 +232,41 @@ startup
 
 init
 {
+    vars.idManip = false;
+    vars.bugCounter =  "1"; 
+    vars.bugWait = "go";
     vars.gotStarter = false;
     vars.starterDropoff = false;
-    vars.idManip = false;
     vars.parcel = false;
     vars.foughtRival = false;
-    vars.gotStarter = false;
-       vars.starterDropoff = false;
-
+    vars.foughtPika = false;
+    vars.foughtBugCatcher1 = false;
+    vars.foughtBugCatcher2 = false;
+    vars.foughtBugCatcher3 = false;
+    
     
     
      
     vars.ptrOffset = IntPtr.Zero;
     vars.wramOffset = IntPtr.Zero;
-    vars.hramOffset = IntPtr.Zero;
-    
+    vars.hramOffset = IntPtr.Zero;    
     vars.wramPtr = new MemoryWatcher<byte>(IntPtr.Zero);
-
     vars.watchers = new MemoryWatcherList();
     vars.splits = new List<Tuple<string, List<Tuple<string, uint>>>>();
-
     vars.stopwatch.Restart();
 }
 
 update
 {
 
-    if (vars.stopwatch.ElapsedMilliseconds > 1500)
-    {
+    if (vars.stopwatch.ElapsedMilliseconds > 1500) {
         vars.FindOffsets(game);
-
         if (vars.wramOffset != IntPtr.Zero && vars.hramOffset != IntPtr.Zero)
         {
             vars.watchers = vars.GetWatcherList(vars.wramOffset, vars.hramOffset);
             vars.stopwatch.Reset();
         }
-        else
-        {
+        else {
             vars.stopwatch.Restart();
             return false;
         }
@@ -283,17 +286,18 @@ update
 }
 
 start
-{
-    vars.gotStarter = false;
-    vars.foughtRival = false;
+{   
+    vars.idManip = false;
     vars.bugCounter =  "1"; 
     vars.bugWait = "go";
-    
+    vars.gotStarter = false;
     vars.starterDropoff = false;
-    vars.idManip = false;
     vars.parcel = false;
-    vars.starterDropoff = false;
-    
+    vars.foughtRival = false;
+    vars.foughtPika = false;
+    vars.foughtBugCatcher1 = false;
+    vars.foughtBugCatcher2 = false;
+    vars.foughtBugCatcher3 = false;
     
     return (vars.watchers["input"].Current & 0x09) != 0 && vars.watchers["fileSelectTiles"].Current == 0x96848DED && vars.watchers["state"].Current == 0x5B91;
 }
@@ -308,7 +312,8 @@ split
 {
 
 
-///////////////// do most of these if seeting is enabled  AND make values reset on timer reset
+vars.rivalName = vars.watchers["rivalName"].Current.ToString();
+vars.opponentName = vars.watchers["opponentName"].Current.ToString();
 
 
 
@@ -317,7 +322,7 @@ if (vars.idManip == false) {
 vars.trainerID = (vars.watchers["idPart1"].Current + " " + vars.watchers["idPart2"].Current );
 //print("vars.trainerID = " + vars.trainerID );
  if (vars.trainerID == "241 200") {
- print("success");
+ //print("success");
  vars.idManip = true ;}
     else {  
    // print("Trainer ID Manip Wrong");
@@ -326,19 +331,14 @@ vars.trainerID = (vars.watchers["idPart1"].Current + " " + vars.watchers["idPart
 
 
 
+//if you win or lose rival fight then split   // do if setting rival
 
-vars.rivalName = vars.watchers["rivalName"].Current.ToString();
-vars.opponentName = vars.watchers["opponentName"].Current.ToString();
-
-
-//if you win or lose rival fight then split
-if (vars.foughtRival == false) {
-if (vars.rivalName.ToString() != "0" && vars.opponentName.ToString() != "0"){
-if (vars.opponentName.ToString() == vars.rivalName.ToString() && vars.watchers["opponentPkmn"].Current == 0u &&  vars.watchers["state"].Current == 0x03AEu ){ 
+if (settings["rivalFight"] == true) {
+if (vars.foughtRival == false && vars.rivalName.ToString() != "0" && vars.opponentName.ToString() != "0" && vars.opponentName.ToString() == vars.rivalName.ToString() && vars.watchers["opponentPkmn"].Current == 0u &&  vars.watchers["state"].Current == 0x03AEu){
 vars.foughtRival = true;
 print("[Autosplitter] CustomSplit: Fought Rival");
 return true; //split
-}}}
+}}
 
 
 
@@ -370,31 +370,22 @@ return true; //split
 
 
 if (settings["depositStarter"] == true) {
-
- 
 //Remembers Starter Pokemon     
-if (vars.gotStarter == false) {
-if (vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0) {
+if (vars.gotStarter == false && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0) {
 vars.starterPkmn = vars.watchers["pkmn0"].Current;
- vars.gotStarter = true;
- 
+vars.gotStarter = true;
 // print("gotStarter = " + vars.gotStarter.ToString());
 // print("starter is " + vars.starterPkmn.ToString());
- 
- 
  //print("vars.starterDropoff  is " + vars.starterDropoff.ToString());
  
  
-}}
+}
 
 
 //splits when starter pokemon is dropped off  
-if (vars.starterDropoff == false && vars.gotStarter == true ){
-
+if (vars.starterDropoff == false && vars.gotStarter == true && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0){
 // print("pkmn0 " + vars.watchers["pkmn0"].Current.ToString());
 // print("starter is " + vars.starterPkmn.ToString());
-
-
 
 
 if (vars.starterPkmn.ToString() != vars.watchers["pkmn0"].Current.ToString()){
