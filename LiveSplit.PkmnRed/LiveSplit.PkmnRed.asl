@@ -22,8 +22,6 @@ startup
     vars.idManip = false;
     vars.bugCounter =  "1"; 
     vars.bugWait = "go";
-    vars.gotStarter = false;
-    vars.starterDropoff = false;
     vars.foughtRival = false;
     vars.foughtPika = false;
     vars.foughtBugCatcher1 = false;
@@ -258,8 +256,6 @@ init
     vars.idManip = false;
     vars.bugCounter =  "1"; 
     vars.bugWait = "go";
-    vars.gotStarter = false;
-    vars.starterDropoff = false;
     vars.foughtRival = false;
     vars.foughtPika = false;
     vars.foughtBugCatcher1 = false;
@@ -312,8 +308,6 @@ start
     vars.idManip = false;
     vars.bugCounter =  "1"; 
     vars.bugWait = "go";
-    vars.gotStarter = false;
-    vars.starterDropoff = false;
     vars.foughtRival = false;
     vars.foughtPika = false;
     vars.foughtBugCatcher1 = false;
@@ -353,7 +347,6 @@ vars.trainerID = (vars.watchers["idPart1"].Current + " " + vars.watchers["idPart
 
 
 //if you win or lose rival fight then split   // do if setting rival
-
 if (settings["rivalFight"] == true) {
 if (vars.foughtRival == false && vars.rivalName.ToString() != "0" && vars.opponentName.ToString() != "0" && vars.opponentName.ToString() == vars.rivalName.ToString() && vars.watchers["opponentPkmn"].Current == 0u &&  vars.watchers["state"].Current == 0x03AEu){
 vars.foughtRival = true;
@@ -369,11 +362,6 @@ return true; //split
 }
 
 
- //print("new liness");
- //print("gotStarter = " + vars.gotStarter.ToString());
- //print("pkmn0 " + vars.watchers["pkmn0"].Current.ToString());
- //print("starterdroppoff is " + vars.starterDropoff );
- //
 
 
 //splits when starter pokemon is dropped off
@@ -382,27 +370,6 @@ if ((vars.watchers["pkmn0"].Old == 0xB0u ||  vars.watchers["pkmn0"].Old == 0xB1u
 print("[Autosplitter] CustomSplit: Deposited Started");
 return true; //split
 }}
- 
- 
-//if (settings["depositStarter"] == true) {
-////Remembers Starter Pokemon     
-//if (vars.gotStarter == false && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0) {
-//vars.starterPkmn = vars.watchers["pkmn0"].Current;
-//vars.gotStarter = true;
-//// print("gotStarter = " + vars.gotStarter.ToString());
-//// print("starter is " + vars.starterPkmn.ToString());
-// //print("vars.starterDropoff  is " + vars.starterDropoff.ToString());
-//}
-////splits when starter pokemon is dropped off  
-//if (vars.starterDropoff == false && vars.gotStarter == true && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0){
-//// print("pkmn0 " + vars.watchers["pkmn0"].Current.ToString());
-//// print("starter is " + vars.starterPkmn.ToString());
-//if (vars.starterPkmn.ToString() != vars.watchers["pkmn0"].Current.ToString()){
-//vars.starterDropoff = true;
-//print("[Autosplitter] CustomSplit: Deposited Started");
-//return true; //split
-//}}}
-
 
 
 
