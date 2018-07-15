@@ -376,33 +376,32 @@ return true; //split
  //
 
 
-
-
+//splits when starter pokemon is dropped off
 if (settings["depositStarter"] == true) {
-//Remembers Starter Pokemon     
-if (vars.gotStarter == false && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0) {
-vars.starterPkmn = vars.watchers["pkmn0"].Current;
-vars.gotStarter = true;
-// print("gotStarter = " + vars.gotStarter.ToString());
-// print("starter is " + vars.starterPkmn.ToString());
- //print("vars.starterDropoff  is " + vars.starterDropoff.ToString());
- 
- 
-}
-
-
-//splits when starter pokemon is dropped off  
-if (vars.starterDropoff == false && vars.gotStarter == true && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0){
-// print("pkmn0 " + vars.watchers["pkmn0"].Current.ToString());
-// print("starter is " + vars.starterPkmn.ToString());
-
-
-if (vars.starterPkmn.ToString() != vars.watchers["pkmn0"].Current.ToString()){
-vars.starterDropoff = true;
+if ((vars.watchers["pkmn0"].Old == 0xB0u ||  vars.watchers["pkmn0"].Old == 0xB1u ||  vars.watchers["pkmn0"].Old == 0x99u) && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0 && vars.watchers["pkmn0"].Current != 0xB0u &&  vars.watchers["pkmn0"].Current != 0xB1u &&  vars.watchers["pkmn0"].Current != 0x99u) {
 print("[Autosplitter] CustomSplit: Deposited Started");
 return true; //split
-}
 }}
+ 
+ 
+//if (settings["depositStarter"] == true) {
+////Remembers Starter Pokemon     
+//if (vars.gotStarter == false && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0) {
+//vars.starterPkmn = vars.watchers["pkmn0"].Current;
+//vars.gotStarter = true;
+//// print("gotStarter = " + vars.gotStarter.ToString());
+//// print("starter is " + vars.starterPkmn.ToString());
+// //print("vars.starterDropoff  is " + vars.starterDropoff.ToString());
+//}
+////splits when starter pokemon is dropped off  
+//if (vars.starterDropoff == false && vars.gotStarter == true && vars.watchers["pkmn0"].Current != 255 && vars.watchers["pkmn0"].Current != 0){
+//// print("pkmn0 " + vars.watchers["pkmn0"].Current.ToString());
+//// print("starter is " + vars.starterPkmn.ToString());
+//if (vars.starterPkmn.ToString() != vars.watchers["pkmn0"].Current.ToString()){
+//vars.starterDropoff = true;
+//print("[Autosplitter] CustomSplit: Deposited Started");
+//return true; //split
+//}}}
 
 
 
