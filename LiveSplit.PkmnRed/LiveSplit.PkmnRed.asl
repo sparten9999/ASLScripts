@@ -40,10 +40,8 @@ startup
     settings.Add("hm02", true, "Obtain HM02");
     settings.Add("flute", true, "Obtain Poké Flute");
     settings.Add("silphGiovanni", true, "Silph Co. (Giovanni)");
-    settings.Add("exitVictoryRoad", true, "Exit Victory Road");
-    
-    
-    settings.Add("gymLeaders", true, "Gym Leaders");
+    settings.Add("exitVictoryRoad", true, "Exit Victory Road");        
+    settings.Add("gymLeaders", false, "Gym Leaders");
     settings.CurrentDefaultParent = "gymLeaders";
     settings.Add("gym1", true, "Pewter Gym (Brock)");
     settings.Add("gym2", true, "Cerulean Gym (Misty)");
@@ -53,9 +51,7 @@ startup
     settings.Add("gym6", true, "Saffron Gym (Sabrina)");
     settings.Add("gym7", true, "Cinnabar Gym (Blaine)");
     settings.Add("gym8", true, "Viridian Gym (Giovanni)");
-    settings.CurrentDefaultParent = "glitchless";
-
-    
+    settings.CurrentDefaultParent = "glitchless";   
     settings.Add("elite4", true, "Elite 4");
     settings.CurrentDefaultParent = "elite4";
     settings.Add("elite4_1", true, "Lorelei");
@@ -81,7 +77,7 @@ startup
     settings.Add("getPokeball", true, "Bought a Pokeball");
     settings.Add("spearow", true, "Caught Spearow");     
     settings.Add("depositStarter", true, "Deposited Starter");      
-    settings.Add("pikaBattle", true, "Pikachu Manip");  
+    settings.Add("pikaBattle", true, "Pikachu Battle");  
     settings.Add("Bug Catchers");
     settings.CurrentDefaultParent = "Bug Catchers";    
     settings.Add("bugCatcher1", true, "Fought Bug Catcher 1");
@@ -331,19 +327,18 @@ vars.rivalName = vars.watchers["rivalName"].Current.ToString();
 vars.opponentName = vars.watchers["opponentName"].Current.ToString();
 
 
-
-// Checks if you got trainer ID manip for NSC 61896  F1C8
-if (vars.idManip == false) {
-vars.trainerID = (vars.watchers["idPart1"].Current + " " + vars.watchers["idPart2"].Current );
-//print("vars.trainerID = " + vars.trainerID );
- if (vars.trainerID == "241 200") {
- //print("success");
- vars.idManip = true ;}
-    else {  
-   // print("Trainer ID Manip Wrong");
-    }
-}
-
+//
+//// Checks if you got trainer ID manip for NSC 61896  F1C8
+//if (vars.idManip == false) {
+//vars.trainerID = (vars.watchers["idPart1"].Current + " " + vars.watchers["idPart2"].Current );
+////print("vars.trainerID = " + vars.trainerID );
+// if (vars.trainerID == "241 200") {
+// //print("success");
+// vars.idManip = true ;}
+//    else {  
+//   // print("Trainer ID Manip Wrong");
+//    }}
+//
 
 
 //if you win or lose rival fight then split   // do if setting rival
